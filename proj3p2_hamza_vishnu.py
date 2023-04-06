@@ -61,7 +61,7 @@ def is_valid_node(node, visited):
     y = map_height - y - 1
     if not (pixels[int(y), int(x)] == [255, 255, 255]).all():
         return False  # in obstacle space
-    threshold_theta = math.radians(180)
+    threshold_theta = math.radians(30)
     for i in range(-1, 2):
         for j in range(-1, 2):
             for k in range(-1, 2):
@@ -89,6 +89,42 @@ def euclidean_distance(node1, node2):
     x2, y2 = node2
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
+# def move_func(input_node, UL, UR, plot=False):
+#     t, dt = 0, 0.1 #Time step
+#     Xi, Yi, Thetai = input_node #Input point's coordinates
+#     Thetan = 3.14 * Thetai / 180 #Convert end point angle to radian
+#     Xn, Yn = Xi, Yi #End point coordinates
+#     Cost=0
+#     while t<1:
+#         t += dt
+#         X_prev, Y_prev = Xn, Yn
+#         Dx = 0.5*R * (UL + UR) * math.cos(Thetan) * dt
+#         Dy = 0.5*R * (UL + UR) * math.sin(Thetan) * dt
+#         Xn += Dx
+#         Yn += Dy
+#         Thetan += (R / L) * (UR - UL) * dt
+#         if Thetan < 0:
+#             Thetan += 2*math.pi
+#         Cost += math.sqrt(math.pow(Dx,2)+math.pow(Dy,2))
+#         if plot: cv2.arrowedLine(pixels, (int(X_prev), map_height - 1 - int(Y_prev)), (int(Xn), map_height - 1 - int(Yn)), (255, 0, 0), thickness=1)
+#     Thetan = (180 * (Thetan) / 3.14) % 360 #Convert back to degrees
+#     return (Xn, Yn, Thetan), Cost
+def is_valid_node2(node):
+    if node is None:
+        return False
+    x, y, _ = node
+    y = map_height - y - 1
+    if (pixels[int(y), int(x)] == [0, 0, 0]).all() or (pixels[int(y), int(x)] == [192, 192, 192]).all():
+        return False  # in obstacle space
+    # threshold_theta = math.radians(180)
+    # for i in range(-1, 2):
+    #     for j in range(-1, 2):
+    #         for k in range(-1, 2):
+    #             neighbor_node = (x + i * threshold, y + j * threshold, k * threshold_theta)
+    #             if neighbor_node in visited:
+    #                 return False  # Too close to a visited node
+    else:   return True
+    
 def move_func(input_node, UL, UR, plot=False):
     t, dt = 0, 0.1 #Time step
     Xi, Yi, Thetai = input_node #Input point's coordinates
@@ -105,14 +141,15 @@ def move_func(input_node, UL, UR, plot=False):
         Xn += Dx
         Yn += Dy
         Thetan += (R / L) * (UR - UL) * dt
-        Xs, Ys = Xn, Yn
-        Cost += math.hypot(Dx, Dy)
+        if Thetan < 0:
+            Thetan += 2*math.pi
+        Cost += math.sqrt(math.pow(Dx,2)+math.pow(Dy,2))
         node = (Xn, Yn, Thetan)
-        '''if not is_valid_node(node, curve):
+        if not is_valid_node2(node):
             valid = False # Mark as invalid
-            break'''
+            break
         curve.append(node) # Add to curve
-        if plot: cv2.arrowedLine(pixels, (int(X_prev), map_height - 1 - int(Y_prev)), (int(Xs), map_height - 1 - int(Ys)), (255, 0, 0), thickness=1)
+        if plot: cv2.arrowedLine(pixels, (int(X_prev), map_height - 1 - int(Y_prev)), (int(Xn), map_height - 1 - int(Yn)), (255, 0, 0), thickness=1)
     Thetan = (180 * (Thetan) / 3.14) % 360 #Convert back to degrees
     if valid:
         return node, Cost
@@ -141,7 +178,6 @@ def a_star(start_node, goal_node, display_animation=True):
         _, current_node = open_list.get()
         closed_list.add(current_node)
         x, y, theta = current_node
-        if theta == 360: theta = 0
         V[int(y / threshold)][int(x / threshold)][int(theta / 30)] = True   # Mark current node as visited
         out.write(pixels)
         if display_animation:
@@ -168,23 +204,22 @@ def a_star(start_node, goal_node, display_animation=True):
 
         for action in actions:    # Iterate through all possible moves
             new_node, move_cost = move_func(current_node, action[0], action[1])
-            print(new_node)
             if is_valid_node(new_node, visited):    # Check if the node is valid
                 i, j, k = int(new_node[1] / threshold), int(new_node[0] / threshold), int(new_node[2] / 30) # Get the index of the node in the 3D array
-                if k == 2: k = 0
-                if not V[i][j][k]:  # Check if the node is in closed list
+                if not V[i][j][k]: # Check if the node is in closed list
                     new_cost_to_come = cost_to_come[current_node] + move_cost
                     new_cost_to_go = euclidean_distance(new_node, goal_node)
                     new_cost = new_cost_to_come + new_cost_to_go    # Update cost
-                    if new_node not in cost or new_cost < cost[new_node]:
+                    if new_node not in cost_to_come or new_cost_to_come < cost_to_come[new_node]:
                         cost_to_come[new_node] = new_cost_to_come   # Update cost to come
                         cost_to_go[new_node] = new_cost_to_go    # Update cost to go
                         cost[new_node] = new_cost   # Update cost
                         parent[new_node] = current_node  # Update parent
+                        V[i][j][k] = True
                         open_list.put((new_cost, new_node)) # Add to open list
                         visited.add(new_node)   # Add to visited list
                         # Draw vector from current_node to new_node
-                        X1, _ = move_func(current_node, action[0], action[1], plot=True)
+                        _, _ = move_func(current_node, action[0], action[1], plot=display_animation)
 
         if cv2.waitKey(1) == ord('q'):
             cv2.destroyAllWindows()
