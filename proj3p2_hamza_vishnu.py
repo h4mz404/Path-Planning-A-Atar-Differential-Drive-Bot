@@ -4,74 +4,47 @@ import cv2
 import math
 from queue import PriorityQueue
 
-R = 0.033   # Radius of the wheel
-r = 0.105   # Radius of the robot
-L = 0.160   # Distance between the wheels
+scale = 50
+R = 0.033 * scale  # Radius of the wheel in m
+r = 0.105 * scale # Radius of the robot in m
+L = 0.160 * scale # Distance between the wheels in m
 map_width, map_height = 600, 250    # Map dimensions
-threshold = 0.5 # Threshold for the goal node
-
-# Define the move functions
-def move_func(input_node, UL, UR, plot=False):
-    t = 0
-    dt = 0.1 #Time step
-    Xi, Yi, Thetai = input_node #Input point's coordinates
-    Thetan = 3.14 * Thetai / 180 #Convert end point angle to radian
-    Xn, Yn = Xi, Yi #End point coordinates
-    scale = 1
-    Xs = Xi
-    Ys = Yi 
-    Cost=0
-    while t<1:
-        t = t + dt
-        X_prev, Y_prev = Xs, Ys
-        Xn += (0.5*R * (UL + UR) * math.cos(Thetan) * dt)
-        Yn += (0.5*R * (UL + UR) * math.sin(Thetan) * dt)
-        Thetan += (R / L) * (UR - UL) * dt
-        Xs = Xn * scale
-        Ys = Yn * scale
-        Cost += math.sqrt(math.pow(Xn, 2) + math.pow(Yn, 2))
-        if plot:
-            cv2.arrowedLine(pixels, (int(X_prev), map_height - 1 - int(Y_prev)), (int(Xs), map_height - 1 - int(Ys)), (255, 0, 0), thickness=1)
-        else:
-            pass
-    Thetan = (180 * (Thetan) / 3.14) % 360 #Convert back to degrees
-    return (Xn, Yn, Thetan), Cost
+threshold = 5 # Threshold for the goal node
 
 def obstacles(clearance):
-    #Define the Obstacle Equations and Map Parameters
+    # Define the Obstacle Equations and Map Parameters
     eqns = {
-        "Rectangle1": lambda x, y: 0 <= y <= 100 and 100 <= x <= 150,
-        "Rectangle2": lambda x, y: 150 <= y <= 250 and 100 <= x <= 150,
-        "Hexagon": lambda x, y: (75/2) * np.abs(x-300)/75 + 50 <= y <= 250 - (75/2) * np.abs(x-300)/75 - 50 and 235 <= x <= 365,
-        "Triangle": lambda x, y: (200/100) * (x-460) + 25 <= y <= (-200/100) * (x-460) + 225 and 460 <= x <= 510
+        "Rectangle1": lambda x, y: np.logical_and(0 <= y, y <= 100) & np.logical_and(100 <= x, x <= 150),
+        "Rectangle2": lambda x, y: np.logical_and(150 <= y, y <= 250) & np.logical_and(100 <= x, x <= 150),
+        "Hexagon": lambda x, y: np.logical_and((75/2) * np.abs(x-300)/75 + 50 <= y, y <= 250 - (75/2) * np.abs(x-300)/75 - 50) & np.logical_and(235 <= x, x <= 365),
+        "Triangle": lambda x, y: np.logical_and((200/100) * (x-460) + 25 <= y, y <= (-200/100) * (x-460) + 225) & np.logical_and(460 <= x, x <= 510)
     }
-
-    clearance = clearance + r
-    pixels = np.full((map_height, map_width, 3), 255, dtype=np.uint8)
     
-    for i in range(map_height):
-        for j in range(map_width):
-            is_obstacle = any(eqn(j, i) for eqn in eqns.values())
-            if is_obstacle:
-                pixels[i, j] = [0, 0, 0]  # obstacle
-            else:
-                is_clearance = any(
-                    eqn(x, y)
-                    for eqn in eqns.values()
-                    for y in np.arange(i - clearance, i + clearance + 1, 0.5)
-                    for x in np.arange(j - clearance, j + clearance + 1, 0.5)
-                    if (x - j)**2 + (y - i)**2 <= clearance**2
-                )
-                if i < clearance or i >= map_height - clearance or j < clearance or j >= map_width - clearance:
-                    pixels[i, j] = [192, 192, 192]  # boundary
-                elif is_clearance:
-                    pixels[i, j] = [192, 192, 192]  # clearance
-                else:
-                    pixels[i, j] = [255, 255, 255]  # free space
+    clearance = clearance + r
+    y, x = np.meshgrid(np.arange(map_height), np.arange(map_width), indexing='ij')  
+    is_obstacle = np.zeros_like(x, dtype=bool)  
+    for eqn in eqns.values():   # Check if the point is an obstacle
+        is_obstacle |= eqn(x, y)
+
+    is_clearance = np.zeros_like(x, dtype=bool) # Check if the point is within the clearance
+    for eqn in eqns.values():
+        for c_x in np.arange(-clearance, clearance+0.5, 0.5):
+            for c_y in np.arange(-clearance, clearance+0.5, 0.5):
+                if (c_x**2 + c_y**2) <= clearance**2:
+                    is_clearance |= eqn(x+c_x, y+c_y)
+
+    pixels = np.full((map_height, map_width, 3), 255, dtype=np.uint8)
+    pixels[is_obstacle] = [0, 0, 0]  # obstacle
+    pixels[np.logical_not(is_obstacle) & np.logical_or.reduce((y < clearance, y >= map_height - clearance, x < clearance, x >= map_width - clearance), axis=0)] = [192, 192, 192]  # boundary
+    pixels[np.logical_not(is_obstacle) & np.logical_not(np.logical_or.reduce((y < clearance, y >= map_height - clearance, x < clearance, x >= map_width - clearance), axis=0)) & is_clearance] = [192, 192, 192]  # clearance
+    pixels[np.logical_not(is_obstacle) & np.logical_not(np.logical_or.reduce((y < clearance, y >= map_height - clearance, x < clearance, x >= map_width - clearance), axis=0)) & np.logical_not(is_clearance)] = [255, 255, 255]  # free space
+
     return pixels
 
 # Define a function to check if current node is in range
 def is_in_range(node):
+    if node is None:
+        return False
     if len(node) == 3:
         x, y, _ = node
     else:
@@ -80,13 +53,15 @@ def is_in_range(node):
     return 0 <= x < map_width and 0 <= y < map_height and (pixels[int(y), int(x)] == [255, 255, 255]).all()
 
 def is_valid_node(node, visited):
+    if node is None:
+        return False
     if not is_in_range(node):
         return False  # out of range
     x, y, _ = node
     y = map_height - y - 1
     if not (pixels[int(y), int(x)] == [255, 255, 255]).all():
         return False  # in obstacle space
-    threshold_theta = math.radians(30)
+    threshold_theta = math.radians(180)
     for i in range(-1, 2):
         for j in range(-1, 2):
             for k in range(-1, 2):
@@ -97,7 +72,7 @@ def is_valid_node(node, visited):
 
 # Define a function to check if current node is the goal node
 def is_goal(current_node, goal_node):
-    return np.sqrt((goal_node[0]-current_node[0])**2 + (goal_node[1]-current_node[1])**2) <= 1.5
+    return np.sqrt((goal_node[0]-current_node[0])**2 + (goal_node[1]-current_node[1])**2) <= 5
 
 # Define a function to find the optimal path
 def backtrack_path(parents, start_node, goal_node):
@@ -111,9 +86,39 @@ def backtrack_path(parents, start_node, goal_node):
 # Define a function to calculate the euclidean distance
 def euclidean_distance(node1, node2):
     x1, y1, _ = node1
-    x2, y2, _ = node2
+    x2, y2 = node2
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
+def move_func(input_node, UL, UR, plot=False):
+    t, dt = 0, 0.1 #Time step
+    Xi, Yi, Thetai = input_node #Input point's coordinates
+    Thetan = 3.14 * Thetai / 180 #Convert end point angle to radian
+    Xn, Yn = Xi, Yi #End point coordinates
+    Cost=0
+    valid = True # Flag to indicate if all points in the curve are valid nodes
+    curve = [input_node] # List to store all the points in the curve
+    while t<1:
+        t += dt
+        X_prev, Y_prev = Xn, Yn
+        Dx = 0.5*R * (UL + UR) * math.cos(Thetan) * dt
+        Dy = 0.5*R * (UL + UR) * math.sin(Thetan) * dt
+        Xn += Dx
+        Yn += Dy
+        Thetan += (R / L) * (UR - UL) * dt
+        Xs, Ys = Xn, Yn
+        Cost += math.hypot(Dx, Dy)
+        node = (Xn, Yn, Thetan)
+        '''if not is_valid_node(node, curve):
+            valid = False # Mark as invalid
+            break'''
+        curve.append(node) # Add to curve
+        if plot: cv2.arrowedLine(pixels, (int(X_prev), map_height - 1 - int(Y_prev)), (int(Xs), map_height - 1 - int(Ys)), (255, 0, 0), thickness=1)
+    Thetan = (180 * (Thetan) / 3.14) % 360 #Convert back to degrees
+    if valid:
+        return node, Cost
+    else:
+        return None, float('inf')
+    
 # Define the A* algorithm
 def a_star(start_node, goal_node, display_animation=True):
     rows = int(map_height / threshold)  # number of rows
@@ -140,7 +145,7 @@ def a_star(start_node, goal_node, display_animation=True):
         V[int(y / threshold)][int(x / threshold)][int(theta / 30)] = True   # Mark current node as visited
         out.write(pixels)
         if display_animation:
-            cv2.imshow('Explored', pixels)
+            cv2.imshow('Path', pixels)
             cv2.waitKey(1)
         # Check if current node is the goal node
         if is_goal(current_node, goal_node):
@@ -148,11 +153,14 @@ def a_star(start_node, goal_node, display_animation=True):
             cost[goal_node] = cost [current_node]   # Cost of goal node
             path = backtrack_path(parent, start_node, approx_goal_node) # Backtrack the path
             if display_animation:
-                for node in path:
-                    x, y, _ = node
-                    cv2.circle(pixels, (int(x), map_height - 1 - int(y)), 1, (0, 0, 255), thickness=-1)
-                out.write(pixels)
+                for i in range(len(path) - 1):
+                                    x1, y1, _ = path[i]
+                                    x2, y2, _ = path[i+1]
+                                    cv2.line(pixels, (int(x1), map_height - 1 - int(y1)), (int(x2), map_height - 1 - int(y2)), (0, 0, 255), thickness=2)
+                cv2.imshow('Path', pixels)
                 cv2.waitKey(0)
+                out.write(pixels)
+
             print("Final Cost: ", cost[goal_node])
             out.release()
             cv2.destroyAllWindows()
@@ -160,14 +168,15 @@ def a_star(start_node, goal_node, display_animation=True):
 
         for action in actions:    # Iterate through all possible moves
             new_node, move_cost = move_func(current_node, action[0], action[1])
+            print(new_node)
             if is_valid_node(new_node, visited):    # Check if the node is valid
                 i, j, k = int(new_node[1] / threshold), int(new_node[0] / threshold), int(new_node[2] / 30) # Get the index of the node in the 3D array
-                if k == 12: k =0
+                if k == 2: k = 0
                 if not V[i][j][k]:  # Check if the node is in closed list
                     new_cost_to_come = cost_to_come[current_node] + move_cost
                     new_cost_to_go = euclidean_distance(new_node, goal_node)
                     new_cost = new_cost_to_come + new_cost_to_go    # Update cost
-                    if new_node not in cost_to_come or new_cost_to_come < cost_to_come[new_node]:
+                    if new_node not in cost or new_cost < cost[new_node]:
                         cost_to_come[new_node] = new_cost_to_come   # Update cost to come
                         cost_to_go[new_node] = new_cost_to_go    # Update cost to go
                         cost[new_node] = new_cost   # Update cost
