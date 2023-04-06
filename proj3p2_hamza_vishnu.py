@@ -89,42 +89,6 @@ def euclidean_distance(node1, node2):
     x2, y2 = node2
     return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
-# def move_func(input_node, UL, UR, plot=False):
-#     t, dt = 0, 0.1 #Time step
-#     Xi, Yi, Thetai = input_node #Input point's coordinates
-#     Thetan = 3.14 * Thetai / 180 #Convert end point angle to radian
-#     Xn, Yn = Xi, Yi #End point coordinates
-#     Cost=0
-#     while t<1:
-#         t += dt
-#         X_prev, Y_prev = Xn, Yn
-#         Dx = 0.5*R * (UL + UR) * math.cos(Thetan) * dt
-#         Dy = 0.5*R * (UL + UR) * math.sin(Thetan) * dt
-#         Xn += Dx
-#         Yn += Dy
-#         Thetan += (R / L) * (UR - UL) * dt
-#         if Thetan < 0:
-#             Thetan += 2*math.pi
-#         Cost += math.sqrt(math.pow(Dx,2)+math.pow(Dy,2))
-#         if plot: cv2.arrowedLine(pixels, (int(X_prev), map_height - 1 - int(Y_prev)), (int(Xn), map_height - 1 - int(Yn)), (255, 0, 0), thickness=1)
-#     Thetan = (180 * (Thetan) / 3.14) % 360 #Convert back to degrees
-#     return (Xn, Yn, Thetan), Cost
-def is_valid_node2(node):
-    if node is None:
-        return False
-    x, y, _ = node
-    y = map_height - y - 1
-    if (pixels[int(y), int(x)] == [0, 0, 0]).all() or (pixels[int(y), int(x)] == [192, 192, 192]).all():
-        return False  # in obstacle space
-    # threshold_theta = math.radians(180)
-    # for i in range(-1, 2):
-    #     for j in range(-1, 2):
-    #         for k in range(-1, 2):
-    #             neighbor_node = (x + i * threshold, y + j * threshold, k * threshold_theta)
-    #             if neighbor_node in visited:
-    #                 return False  # Too close to a visited node
-    else:   return True
-    
 def move_func(input_node, UL, UR, plot=False):
     t, dt = 0, 0.1 #Time step
     Xi, Yi, Thetai = input_node #Input point's coordinates
@@ -132,7 +96,6 @@ def move_func(input_node, UL, UR, plot=False):
     Xn, Yn = Xi, Yi #End point coordinates
     Cost=0
     valid = True # Flag to indicate if all points in the curve are valid nodes
-    curve = [input_node] # List to store all the points in the curve
     while t<1:
         t += dt
         X_prev, Y_prev = Xn, Yn
@@ -145,10 +108,9 @@ def move_func(input_node, UL, UR, plot=False):
             Thetan += 2*math.pi
         Cost += math.sqrt(math.pow(Dx,2)+math.pow(Dy,2))
         node = (Xn, Yn, Thetan)
-        if not is_valid_node2(node):
+        if (pixels[int(map_height - Yn - 1), int(Xn)] == [0, 0, 0]).all() or (pixels[int(map_height - Yn - 1), int(Xn)] == [192, 192, 192]).all():
             valid = False # Mark as invalid
             break
-        curve.append(node) # Add to curve
         if plot: cv2.arrowedLine(pixels, (int(X_prev), map_height - 1 - int(Y_prev)), (int(Xn), map_height - 1 - int(Yn)), (255, 0, 0), thickness=1)
     Thetan = (180 * (Thetan) / 3.14) % 360 #Convert back to degrees
     if valid:
@@ -218,8 +180,7 @@ def a_star(start_node, goal_node, display_animation=True):
                         V[i][j][k] = True
                         open_list.put((new_cost, new_node)) # Add to open list
                         visited.add(new_node)   # Add to visited list
-                        # Draw vector from current_node to new_node
-                        _, _ = move_func(current_node, action[0], action[1], plot=display_animation)
+                        _, _ = move_func(current_node, action[0], action[1], plot=display_animation) # Plot the path
 
         if cv2.waitKey(1) == ord('q'):
             cv2.destroyAllWindows()
