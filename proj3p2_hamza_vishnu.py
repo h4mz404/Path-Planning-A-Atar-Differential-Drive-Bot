@@ -193,6 +193,7 @@ def a_star(start_node, goal_node, display_animation=True):
 # Get valid start and goal nodes from user input
 while True:
     clearance = int(input("\nEnter the clearance: "))
+    print("\nGenerating Map...")
     pixels = obstacles(clearance)
     start_node = tuple(map(int, input("Enter the start node (in the format 'x y o'): ").split()))
     if not is_in_range(start_node):
