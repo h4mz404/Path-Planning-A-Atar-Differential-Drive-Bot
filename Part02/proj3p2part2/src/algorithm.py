@@ -9,6 +9,8 @@ from geometry_msgs.msg import Twist
 import rospy
 
 scale = 100 # Scale of the map to convert from m to pixels
+wr = 0.033
+wl = 0.160
 R = 0.033 * scale  # Radius of the wheel in m
 r = 0.105 * scale  # Radius of the robot in m
 L = 0.160 * scale # Distance between the wheels in m
@@ -22,7 +24,6 @@ def obstacles(clearance):
         "Rectangle2": lambda x, y: np.logical_and(0*scale <= map_height - y - 1, map_height - y - 1 <= 1.25*scale) & np.logical_and(2.50*scale <= x, x <= 2.65*scale),
         "Circle": lambda x, y: (x - (4*scale))**2 + (map_height - y - 1 - (1.1*scale))**2 <= (0.5*scale)**2
     }
-    
     clearance = clearance + r
     y, x = np.meshgrid(np.arange(map_height), np.arange(map_width), indexing='ij')  
     is_obstacle = np.zeros_like(x, dtype=bool)  
@@ -95,7 +96,7 @@ def euclidean_distance(node1, node2):
 def move_func(input_node, UL, UR, plot=False):
     t, dt = 0, 0.1 #Time step
     Xi, Yi, Thetai = input_node #Input point's coordinates
-    Thetan = math.pi * Thetai / 180 #Convert end point angle to radian
+    Thetan = 3.14 * Thetai / 180 #Convert end point angle to radian
     Xn, Yn = Xi, Yi #End point coordinates
     Cost=0
     valid = True # Flag to indicate if all points in the curve are valid nodes
@@ -115,7 +116,7 @@ def move_func(input_node, UL, UR, plot=False):
             valid = False # Mark as invalid
             break
         if plot: cv2.arrowedLine(pixels, (int(X_prev), map_height - 1 - int(Y_prev)), (int(Xn), map_height - 1 - int(Yn)), (255, 0, 0), thickness=1)
-    Thetan = (180 * (Thetan) / math.pi) % 360 #Convert back to degrees
+    Thetan = (180 * (Thetan) / 3.14) % 360 #Convert back to degrees
     if valid:
         return node, Cost
     else:
@@ -165,8 +166,9 @@ def a_star(start_node, goal_node, display_animation=True):
                                     x2, y2, _ = path[i+1]
                                     cv2.line(pixels, (int(x1), map_height - 1 - int(y1)), (int(x2), map_height - 1 - int(y2)), (0, 0, 255), thickness=2)
                 cv2.imshow('Path', pixels)
-                cv2.waitKey(5000)
+                cv2.waitKey(0)
                 out.write(pixels)
+
             print("Final Cost: ", cost[goal_node])
             out.release()
             cv2.destroyAllWindows()
@@ -193,18 +195,15 @@ def a_star(start_node, goal_node, display_animation=True):
         if cv2.waitKey(1) == ord('q'):
             cv2.destroyAllWindows()
             break
-        
+
     out.release()
     cv2.destroyAllWindows()
     return None
 
-time.sleep(5)
 # Get valid start and goal nodes from user input
 while True:
     clearance = float(input("\nEnter the clearance (in m): "))
-    print("Generating 2D map...")
     pixels = obstacles(clearance*scale)
-    print("Map generated.")
     start_node = tuple(map(float, input("Enter the start node (in the format 'x y o')(in m): ").split()))
     start_node = ((start_node[0]+0.5)*scale, (start_node[1]+1)*scale, start_node[2])
     if not is_in_range(start_node):
@@ -215,24 +214,26 @@ while True:
     if not is_in_range(goal_node):
         print("Error: Goal node is in the obstacle space, clearance area, out of bounds or orientation was not given in the required format. Please input a valid node.")
         continue
-    RPM1, RPM2 = map(int, input("Enter RPM1, RPM2 (in the format 'R1 R2'): ").split())
+    RPM1 = int(input("Enter RPM1: "))
+    RPM2 = int(input("Enter RPM2: "))
     break
 
 actions=[[RPM1,RPM1], [0,RPM1], [RPM1,0], [RPM2,RPM2], [0,RPM2], [RPM2,0], [RPM1,RPM2], [RPM2,RPM1]]  # List of actions
 
 # Run A* algorithm
 start_time = time.time()
-path, act = a_star(start_node, goal_node)
+path, actions = a_star(start_node, goal_node)
 for i in range(len(path)):
     x, y, theta = path[i]
     path[i] = (x/scale - 0.5, y/scale - 1, theta)
 if path is None:
     print("\nError: No path found.")
 else:
-    print("\nGoal Node Reached!\n\nShortest Path: ", path, "\n\nActions: ", act, "\n")
+    print("\nGoal Node Reached!\n\nShortest Path: ", path, "\n\nActions: ", actions, "\n")
 end_time = time.time()
-print("Runtime:", end_time - start_time, "seconds\n\nStarting ROS simulation...")
+print("Runtime:", end_time - start_time, "seconds\n")
 
+print('\nSending data for Gazebo Simulation...')
 rospy.init_node('algorithm', anonymous=True)
 velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 data = Twist()
@@ -241,23 +242,73 @@ data.angular.z = 0.0
 velocity_publisher.publish(data)
 step = 0
 rate = rospy.Rate(10)
-for action in act:
-    while not rospy.is_shutdown():
-        if step == len(act):
+prev_ang = 0
+print('\nSimulation Start')
+while not rospy.is_shutdown():
+    for action in actions:
+        if step == len(actions):
             data.linear.x = 0
             data.angular.z = 0
             velocity_publisher.publish(data)
             break
         else:
+        
             vel_l = action[0]
             vel_r = action[1]
-            th = ((R/scale) / (L/scale)) * (vel_r - vel_l) * 2 * math.pi / 60
-            vel = ((R/scale) / 2) * (vel_l + vel_r)
-            data.linear.x = vel 
-            data.angular.z = th
+            th = (wr / wl) * (vel_r - vel_l)  
+            
+            if prev_ang == th: th_c =0
+            else: th_c = th 
+          
+            '''
+            angular_vel = 1.1
+            th = (th - prev_ang)
+            if th>=0:
+                  angular_vel = angular_vel
+                  t_a = th/angular_vel
+            else:
+                  angular_vel = -angular_vel
+                  t_a = th/angular_vel
+            print(t_a/10)
+            
+            '''
+            data.linear.x = 0.0
+            data.angular.z = th_c
             velocity_publisher.publish(data)
+            rospy.sleep(0.7)
+            data.linear.x = 0.0
+            data.angular.z = 0.0
+            #rospy.sleep(1)
+            velocity_publisher.publish(data)
+            
+            vel = (wr / 2) * (vel_l + vel_r)   
+            t = 1.5
+            if vel>0.3:
+                  vel=0.16
+                  t=1.5
+            elif vel>0.2:
+                  vel = 0.12
+                  t=1.5
+            elif vel>0.15:
+                  vel = 0.11
+                  t=1.6
+            else: vel = 0.09
+            print(vel,th)
+            data.linear.x = vel 
+            data.angular.z = 0
+            velocity_publisher.publish(data)
+            rospy.sleep(t)
+            data.linear.x = 0.0
+            data.angular.z = 0.0
+            velocity_publisher.publish(data)
+            #rospy.sleep(1)  
+            prev_ang = th
             step += 1
-            rate.sleep()
-    step = 0
-
-print("Simulation complete. Reached Goal Node.\n")
+    data.linear.x = 0.0
+    data.angular.z = 0.0
+    velocity_publisher.publish(data)
+    print('\nSimulation End')
+    break
+    #step = 0
+   
+  
