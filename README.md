@@ -29,18 +29,18 @@ Math
 
 **Contents**
 
-*Part01
- *proj3p2_hamza_vishnu.py
-*Part0
- *proj3p2part2
-  *src	
-   *proj3p2part2.py		
-  *launch	
-   *astar_turtlebot.launch			
-  *world	
-   *map.world			
-*proj3p2_hamza_vishnu.pdf
-*README.md
+* Part01
+ * proj3p2_hamza_vishnu.py
+* Part0
+ * proj3p2part2
+  * src	
+   * proj3p2part2.py		
+  * launch	
+   * astar_turtlebot.launch			
+  * world	
+   * map.world			
+* proj3p2_hamza_vishnu.pdf
+* README.md
 
 **Instructions**
 1. Download the zip file and extract it
