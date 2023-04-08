@@ -45,9 +45,12 @@ The program then uses A* algorithm to find the optimal path from the start node 
 **Instructions**
 1. Download the zip file and extract it
 	
-2. Install python and the required dependencies: pip install numpy opencv-python
+2. Install python and the required dependencies: 
+
+`pip install numpy opencv-python`
 	
-3. Run the code: Part01/proj3p2_hamza_vishnu.py
+3. Run the code:
+`$python3 Part01/proj3p2_hamza_vishnu.py`
 	
 4. Type in the Clearance Value, Start Node(x y 0) and Goal Node(x y) and the Wheel RPM1 and RPM2
 	
