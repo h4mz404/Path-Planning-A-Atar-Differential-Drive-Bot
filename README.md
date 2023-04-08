@@ -48,7 +48,7 @@ Instructions
 	2. Install python and the required dependencies: pip install numpy opencv-python
 	3. Run the code: Part01/proj3p2_hamza_vishnu.py
 	4. Type in the Clearance Value, Start Node(x y 0) and Goal Node(x y) and the Wheel RPM1 and RPM2
-    5. The optimal path will be displayed on the screen and saved to a video file named animation.mp4 in the same directory as the program. The final cost of the path will be displayed in the console.
+    	5. The optimal path will be displayed on the screen and saved to a video file named animation.mp4 in the same directory as the program. The final cost of the path will be displayed in the console.
 
 Example Output
 
@@ -98,14 +98,17 @@ Libraries
 	ggeometry_msgs
 
 Instructions
-	1. Download the zip file and extract it
-	2. Install python and the required dependencies: pip install numpy opencv-python
-	3. Navigate to Part02/proj3p2part2, open terminal in this folder and run the command
+1. Download the zip file and extract it
+	
+2. Install python and the required dependencies: pip install numpy opencv-python
+	
+3. Navigate to Part02/proj3p2part2, open terminal in this folder and run the command
 	  >'catkin_make' 
 	   to initialize it as a ROS workspace. Then source this ROS workspace using "source". Once this is done run the Gazebo simulation using the command 
 	   >roslaunch proj3p2part2
-	4. Type in the Clearance Value, Start Node(x y 0) and Goal Node(x y) and the Wheel RPM1 and RPM2 when asked by the program in the 
+	   
+4. Type in the Clearance Value, Start Node(x y 0) and Goal Node(x y) and the Wheel RPM1 and RPM2 when asked by the program in the 
 	    terminal
-    5. The optimal path followed by the Turtlebot3 will be simulated in Gazebo. The final cost of the path will be displayed in the console.
+5. The optimal path followed by the Turtlebot3 will be simulated in Gazebo. The final cost of the path will be displayed in the console.
 
 Example Output
