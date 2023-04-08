@@ -1,10 +1,10 @@
-# PROJECT 3 PART 2
+# Implementation of the A* algorithm on a Differential Drive (non-holonomic) TurtleBot3 robot
+
+PROJECT 3 PART 2
 
 ENPM661 - Planning For Autonomous Robots
 Hamza Shah Khan: 119483152 | hamzask@umd.edu
 Vishnu Mandala: 119452608 | vishnum@umd.edu
-
-# Implementation of the A* algorithm on a Differential Drive (non-holonomic) TurtleBot3 robot
 
 # Part01: 2D Implementation
 
@@ -69,7 +69,7 @@ https://drive.google.com/file/d/1d204RiwlYIIe02Jf-8912CeFpOY6TO14/view?usp=share
 
 Link to Github Repo: https://github.com/h4mz404/Path-Planning-A-Star-Differential-Drive-Bot
 
-Part02: Gazebo Visualization
+## Part02: Gazebo Visualization
 
 This part of the project is to simulate the path planning implementation on Gazebo with the TurtleBot3 Burger robot.
 
