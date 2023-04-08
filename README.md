@@ -17,8 +17,10 @@ The program first creates a 2D map of the environment with the obstacles marked 
 The program then uses A* algorithm to find the optimal path from the start node to the goal node considering the differential drive constraints of the Turtlebot3 robot while also avoiding the obstacles. The algorithm is visualized using animation, with each visited node marked in blue and the optimal path marked in red. The final cost of the path is also displayed.
 
 **Dependencies**
-	* python 3.11 (any version above 3 should work)
-	* Python running IDE (We used VS Code)
+
+* python 3.11 (any version above 3 should work)
+	
+* Python running IDE (We used VS Code)
 
 **Libraries**
 * NumPy
