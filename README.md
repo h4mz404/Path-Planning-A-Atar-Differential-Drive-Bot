@@ -75,11 +75,11 @@ Shortest Path:  [(20, 20, 30), (26.54182893409348, 31.118210587843492, 1.6577083
 
 Runtime: 11.02682089805603 seconds
 
-**Animation**
+### **Animation**
 https://drive.google.com/file/d/1d204RiwlYIIe02Jf-8912CeFpOY6TO14/view?usp=share_link
 
 
-**Link to Github Repo:** https://github.com/h4mz404/Path-Planning-A-Star-Differential-Drive-Bot
+### **Link to Github Repo:** https://github.com/h4mz404/Path-Planning-A-Star-Differential-Drive-Bot
 
 ## Part 02: Gazebo Visualization
 
