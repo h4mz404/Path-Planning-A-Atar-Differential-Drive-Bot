@@ -47,10 +47,11 @@ The program then uses A* algorithm to find the optimal path from the start node 
 	
 2. Install python and the required dependencies: 
 
-`pip install numpy opencv-python`
+	`pip install numpy opencv-python`
 	
 3. Run the code:
-`$python3 Part01/proj3p2_hamza_vishnu.py`
+
+	`$python3 Part01/proj3p2_hamza_vishnu.py`
 	
 4. Type in the Clearance Value, Start Node(x y 0) and Goal Node(x y) and the Wheel RPM1 and RPM2
 	
@@ -110,19 +111,19 @@ corresponding velocity commands published to the appropriate ROS topic.
 	
 2. Install python and the required dependencies:
 
-   `pip install numpy opencv-python`
+	`$pip install numpy opencv-python`
 	
 3. Navigate to Part02/proj3p2part2, open terminal in this folder and run the command
 
-	  `catkin_make`
+	  `$catkin_make`
 	  
 	  to initialize it as a ROS workspace. Then source this ROS workspace using "source".
 	  
-	  `source devel/setup.bash`
+	  `$source catkin_ws/devel/setup.bash`
 	  
 	  Once this is done run the Gazebo simulation using the command 
 	  
-	  `roslaunch proj3p2part2`
+	  `$roslaunch proj3p2part2`
 	   
 4. Type in the Clearance Value, Start Node(x y 0) and Goal Node(x y) and the Wheel RPM1 and RPM2 when asked by the program in the 
 	    terminal
