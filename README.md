@@ -6,7 +6,7 @@ ENPM661 - Planning For Autonomous Robots
 Hamza Shah Khan: 119483152 | hamzask@umd.edu
 Vishnu Mandala: 119452608 | vishnum@umd.edu
 
-# Part01: 2D Implementation
+## Part 01: 2D Implementation
 
 Part01 of this project implements a path planning algorithm using A* algorithm on a differential drive TurtleBot3 robot, to find the optimal path from a start node to a goal node in a 2D environment with obstacles. The obstacles are defined using half-plane equations, and the map parameters include width, height, radius and clearance.
 
@@ -69,7 +69,7 @@ https://drive.google.com/file/d/1d204RiwlYIIe02Jf-8912CeFpOY6TO14/view?usp=share
 
 Link to Github Repo: https://github.com/h4mz404/Path-Planning-A-Star-Differential-Drive-Bot
 
-## Part02: Gazebo Visualization
+## Part 02: Gazebo Visualization
 
 This part of the project is to simulate the path planning implementation on Gazebo with the TurtleBot3 Burger robot.
 
