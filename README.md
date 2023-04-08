@@ -136,7 +136,7 @@ corresponding velocity commands published to the appropriate ROS topic.
 	  
 	  Once this is done run the Gazebo simulation using the command 
 	  
-	  `$roslaunch proj3p2part2`
+	  `$roslaunch proj3p2part2 astar_turtlebot.launch`
 	   
 4. Type in the Clearance Value, Start Node(x y 0) and Goal Node(x y) and the Wheel RPM1 and RPM2 when asked by the program in the 
 	    terminal
