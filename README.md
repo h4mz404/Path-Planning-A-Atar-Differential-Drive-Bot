@@ -1,4 +1,3 @@
-# Path-Planning-A-Atar-Differential-Drive-Bot
 PROJECT 3 PART 2
 ENPM661 - Planning For Autonomous Robots
 Hamza Shah Khan: 119483152 | hamzask@umd.edu
