@@ -29,15 +29,15 @@ Libraries
 
 Contents
 
->Part01
+->Part01
 	proj3p2_hamza_vishnu.py
->Part02
-	>proj3p2part2
-		>src
+->Part02
+	->proj3p2part2
+		->src
 			proj3p2part2.py
-		>launch
+		->launch
 			astar_turtlebot.launch
-		>world
+		->world
 			map.world
 proj3p2_hamza_vishnu.pdf
 README.md
