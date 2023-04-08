@@ -134,13 +134,21 @@ corresponding velocity commands published to the appropriate ROS topic.
 	  
 	  `$source catkin_ws/devel/setup.bash`
 	  
-	  Once this is done run the Gazebo simulation using the command 
+	  Once this is done, Start the ROS Master by running
+	  
+	  `$roscore`
+	  
+	  run the launch file in another terminal using the command 
 	  
 	  `$roslaunch proj3p2part2 astar_turtlebot.launch`
+	  
+	  and run the ROS executable file in another terminal using the command
+	  
+	  `$rosrun proj3p2part2 algorithm.py`
 	   
 4. Type in the Clearance Value, Start Node(x y 0) and Goal Node(x y) and the Wheel RPM1 and RPM2 when asked by the program in the 
 	    terminal
-5. The optimal path followed by the Turtlebot3 will be simulated in Gazebo. The final cost of the path will be displayed in the console.
+5. The optimal path calculated using A* is displayed. The final cost of the path will be displayed in the console. Close the path display window to start the Gazebo Simulation.
 
 ### **Example Output**
 
