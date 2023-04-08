@@ -105,7 +105,9 @@ corresponding velocity commands published to the appropriate ROS topic.
 **Instructions**
 1. Download the zip file and extract it
 	
-2. Install python and the required dependencies: pip install numpy opencv-python
+2. Install python and the required dependencies:
+
+   `pip install numpy opencv-python`
 	
 3. Navigate to Part02/proj3p2part2, open terminal in this folder and run the command
 
