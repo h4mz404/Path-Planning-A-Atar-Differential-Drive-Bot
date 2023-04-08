@@ -3,7 +3,9 @@
 PROJECT 3 PART 2
 
 ENPM661 - Planning For Autonomous Robots
+
 Hamza Shah Khan: 119483152 | hamzask@umd.edu
+
 Vishnu Mandala: 119452608 | vishnum@umd.edu
 
 ## Part 01: 2D Implementation
