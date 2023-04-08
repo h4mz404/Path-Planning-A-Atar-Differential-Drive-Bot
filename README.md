@@ -1,8 +1,8 @@
 # Implementation of the A* algorithm on a Differential Drive (non-holonomic) TurtleBot3 robot
 
-PROJECT 3 PART 2
+### PROJECT 3 PART 2
 
-ENPM661 - Planning For Autonomous Robots
+**ENPM661 - Planning For Autonomous Robots**
 
 Hamza Shah Khan: 119483152 | hamzask@umd.edu
 
