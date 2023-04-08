@@ -33,9 +33,9 @@ The program then uses A* algorithm to find the optimal path from the start node 
 
 ### **Contents**
 
-* Part01
+* Part 01
   * proj3p2_hamza_vishnu.py
-* Part0
+* Part 02
   * proj3p2part2
     * src	
       * proj3p2part2.py		
