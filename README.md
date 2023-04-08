@@ -107,9 +107,13 @@ Instructions
 2. Install python and the required dependencies: pip install numpy opencv-python
 	
 3. Navigate to Part02/proj3p2part2, open terminal in this folder and run the command
-	  >'catkin_make' 
+	  >catkin_make
 	  
-	  to initialize it as a ROS workspace. Then source this ROS workspace using "source". Once this is done run the Gazebo simulation using the command 
+	  to initialize it as a ROS workspace. Then source this ROS workspace using "source".
+	  
+	  >source devel/setup.bash
+	  
+	  Once this is done run the Gazebo simulation using the command 
 	  
 	  >roslaunch proj3p2part2
 	   
