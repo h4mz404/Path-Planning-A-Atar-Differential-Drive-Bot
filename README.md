@@ -4,7 +4,7 @@
 
 ### ENPM661 - Planning For Autonomous Robots 
 
-**PROJECT 3 PART 2**
+**PROJECT 3 PHASE 2**
 
 Hamza Shah Khan: 119483152 | hamzask@umd.edu
 
