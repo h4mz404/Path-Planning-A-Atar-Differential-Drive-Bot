@@ -118,7 +118,7 @@ def move_func(input_node, UL, UR, plot=False):
         if plot: cv2.arrowedLine(pixels, (int(X_prev), map_height - 1 - int(Y_prev)), (int(Xn), map_height - 1 - int(Yn)), (255, 0, 0), thickness=1)
     Thetan = (180 * (Thetan) / 3.14) % 360 #Convert back to degrees
     if valid:
-        return node, Cost
+        return (Xn, Yn, Thetan), Cost
     else:
         return None, float('inf')
     
