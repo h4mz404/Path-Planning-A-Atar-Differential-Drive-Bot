@@ -10,7 +10,7 @@ Hamza Shah Khan: 119483152 | hamzask@umd.edu
 
 Vishnu Mandala: 119452608 | vishnum@umd.edu
 
-## Part 01: 2D Implementation
+## Part 1: 2D Implementation
 
 Part01 of this project implements a path planning algorithm using A* algorithm on a differential drive TurtleBot3 robot, to find the optimal path from a start node to a goal node in a 2D environment with obstacles. The obstacles are defined using half-plane equations, and the map parameters include width, height, radius and clearance.
 
@@ -83,16 +83,15 @@ Shortest Path:  [(20, 20, 30), (35.72076941345914, 29.070827362972288, 30.0), (4
 
 Runtime: 187.375009059906 seconds
 
+### **Output**
+
+![alt text](https://github.com/h4mz404/Path-Planning-A-Star-TurtleBot3/blob/main/Part01/part1_output.png)
+
 ### **Animation**
 
 https://drive.google.com/file/d/1d204RiwlYIIe02Jf-8912CeFpOY6TO14/view?usp=share_link
 
-
-### **Link to Github Repo**
-
-https://github.com/h4mz404/Path-Planning-A-Star-Differential-Drive-Bot
-
-## Part 02: Gazebo Visualization
+## Part 2: Gazebo Visualization
 
 This part of the project is to simulate the path planning implementation on Gazebo with the TurtleBot3 Burger robot.
 
@@ -176,6 +175,11 @@ Runtime: 21.750512838363647 seconds
 
 Starting ROS simulation...
 Simulation complete. Reached Goal Node.
+
+
+### **Output**
+
+![alt text](https://github.com/h4mz404/Path-Planning-A-Star-TurtleBot3/blob/main/Part02/proj3p2part2/part2_output.png)
 
 ### **Animation**
 
